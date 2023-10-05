@@ -24,7 +24,8 @@ class DetailActivity : AppCompatActivity() {
         totalExpensesTextView = findViewById(R.id.textViewTotalExpenses)
         cashSalesTextView = findViewById(R.id.textViewCashSales)
         onlineSalesTextView = findViewById(R.id.textViewOnlineSales)
-        recyclerViewExpenses = findViewById(R.id.listViewExpenses)
+        val recyclerViewExpenses = findViewById<RecyclerView>(R.id.recyclerViewExpenses)
+
 
         val dailyRecord = intent.getSerializableExtra("dailyRecord") as? DailyRecord
 
