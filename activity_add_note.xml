@@ -9,7 +9,6 @@
     android:padding="16dp"
     tools:context=".AddNoteActivity">
 
-    <!-- Campos de entrada de fecha, ventas en efectivo y ventas en línea -->
     <EditText
         android:id="@+id/editTextDate"
         android:layout_width="match_parent"
@@ -34,7 +33,6 @@
         android:inputType="numberDecimal"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Botón para agregar campos de gasto dinámicos -->
     <Button
         android:id="@+id/buttonAddExpense"
         android:layout_width="wrap_content"
@@ -42,7 +40,6 @@
         android:text="Agregar Gasto"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Contenedor para campos de gasto dinámicos -->
     <LinearLayout
         android:id="@+id/expenseContainer"
         android:layout_width="match_parent"
@@ -56,5 +53,4 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Guardar Nota"/>
-
 </LinearLayout>
