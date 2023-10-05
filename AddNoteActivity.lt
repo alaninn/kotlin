@@ -1,4 +1,5 @@
 package com.alan.appdiariolocal
+
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -10,8 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 
 class AddNoteActivity : AppCompatActivity() {
     private lateinit var expenseContainer: LinearLayout
+    private lateinit var expenseNameEditTexts: MutableList<EditText>
+    private lateinit var expenseValueEditTexts: MutableList<EditText>
     private var expenseCounter = 1
-    private val expenses = mutableListOf<Pair<String, Double>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,6 +22,8 @@ class AddNoteActivity : AppCompatActivity() {
         val buttonSave = findViewById<Button>(R.id.buttonSave)
         val buttonAddExpense = findViewById<Button>(R.id.buttonAddExpense)
         expenseContainer = findViewById(R.id.expenseContainer)
+        expenseNameEditTexts = mutableListOf() // Inicializar la lista
+        expenseValueEditTexts = mutableListOf() // Inicializar la lista
 
         buttonAddExpense.setOnClickListener {
             addExpenseField()
@@ -27,8 +31,8 @@ class AddNoteActivity : AppCompatActivity() {
 
         buttonSave.setOnClickListener {
             val date = findViewById<EditText>(R.id.editTextDate).text.toString()
-            val cashSales = findViewById<EditText>(R.id.editTextCashSales).text.toString().toDoubleOrNull() ?: 0.0
-            val onlineSales = findViewById<EditText>(R.id.editTextOnlineSales).text.toString().toDoubleOrNull() ?: 0.0
+            val cashSales = findViewById<EditText>(R.id.editTextCashSales).text.toString().toLongOrNull() ?: 0
+            val onlineSales = findViewById<EditText>(R.id.editTextOnlineSales).text.toString().toLongOrNull() ?: 0
 
             var allFieldsValid = true
 
@@ -37,28 +41,24 @@ class AddNoteActivity : AppCompatActivity() {
                 allFieldsValid = false
             }
 
-            if (cashSales == 0.0) {
+            if (cashSales == 0L) {
                 findViewById<EditText>(R.id.editTextCashSales).error = "Este campo es obligatorio"
                 allFieldsValid = false
             }
 
-            if (onlineSales == 0.0) {
+            if (onlineSales == 0L) {
                 findViewById<EditText>(R.id.editTextOnlineSales).error = "Este campo es obligatorio"
                 allFieldsValid = false
             }
 
             if (allFieldsValid) {
-                expenses.clear()
+                val expenses = mutableListOf<Pair<String, Long>>()
+                for (i in 0 until expenseCounter - 1) {
+                    val nombre = expenseNameEditTexts[i].text.toString()
+                    val valor = expenseValueEditTexts[i].text.toString().toLongOrNull() ?: 0
 
-                for (i in 2..expenseCounter) {
-                    val nombreEditText = findViewById<EditText>(resources.getIdentifier("editTextExpenseName$i", "id", packageName))
-                    val valorEditText = findViewById<EditText>(resources.getIdentifier("editTextExpenseValue$i", "id", packageName))
-                    val nombre = nombreEditText.text.toString()
-                    val valor = valorEditText.text.toString().toDoubleOrNull() ?: 0.0
-
-                    // Validar si el nombre del gasto está vacío
                     if (TextUtils.isEmpty(nombre)) {
-                        nombreEditText.error = "Este campo es obligatorio"
+                        expenseNameEditTexts[i].error = "Este campo es obligatorio"
                         allFieldsValid = false
                         break
                     }
@@ -66,15 +66,14 @@ class AddNoteActivity : AppCompatActivity() {
                     expenses.add(Pair(nombre, valor))
                 }
 
-                if (allFieldsValid) {
+                if (allFieldsValid || !expenses.isEmpty()) {
                     val dailyRecord = DailyRecord(date, expenses, cashSales, onlineSales)
-
                     val resultIntent = Intent()
                     resultIntent.putExtra("newRecord", dailyRecord)
                     setResult(RESULT_OK, resultIntent)
                     finish()
                 } else {
-                    Toast.makeText(this, "Por favor, complete todos los campos obligatorios.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Por favor, complete todos los campos obligatorios o agregue al menos un campo de gastos.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -103,13 +102,16 @@ class AddNoteActivity : AppCompatActivity() {
             1f
         )
         newExpenseValueEditText.hint = "Valor"
-        newExpenseValueEditText.inputType = android.text.InputType.TYPE_CLASS_NUMBER or
-                android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+        newExpenseValueEditText.inputType = android.text.InputType.TYPE_CLASS_NUMBER
 
         newRow.addView(newExpenseNameEditText)
         newRow.addView(newExpenseValueEditText)
 
         expenseContainer.addView(newRow, expenseContainer.childCount - 1)
+
+        // Agregar los EditTexts a las listas
+        expenseNameEditTexts.add(newExpenseNameEditText)
+        expenseValueEditTexts.add(newExpenseValueEditText)
 
         expenseCounter++
     }
